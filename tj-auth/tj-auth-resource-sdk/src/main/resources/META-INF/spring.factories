@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  edu.nus.iss.authsdk.resource.config.ResourceInterceptorConfiguration, \
+  edu.nus.iss.authsdk.resource.config.FeignRelayUserAutoConfiguration

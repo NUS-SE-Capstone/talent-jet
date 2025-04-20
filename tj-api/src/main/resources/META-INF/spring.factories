@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  edu.nus.iss.api.config.RequestIdRelayConfiguration, \
+  edu.nus.iss.api.config.RoleCacheConfig, \
+  edu.nus.iss.api.config.FallbackConfig, \
+  edu.nus.iss.api.config.CategoryCacheConfig

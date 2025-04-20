@@ -1,0 +1,46 @@
+server:
+  port: 8082  #端口
+  tomcat:
+    uri-encoding: UTF-8   #服务编码
+spring:
+  profiles:
+    active: dev
+  application:
+    name: user-service
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        shared-configs: # 共享配置
+          - data-id: shared-spring.yaml # 共享spring配置
+            refresh: false
+          - data-id: shared-redis.yaml # 共享redis配置
+            refresh: false
+          - data-id: shared-mybatis.yaml # 共享mybatis配置
+            refresh: false
+          - data-id: shared-logs.yaml # 共享日志配置
+            refresh: false
+          - data-id: shared-feign.yaml # 共享feign配置
+            refresh: false
+tj:
+  swagger:
+    enable: true
+    enableResponseWrap: true
+    package-path: edu.nus.iss.user.controller
+    title: Talent-Jet - User Management API Doc
+    description: User Management
+    contact-name: NUS-ISS
+    contact-url: http://iss.nus.edu.sg/
+    contact-email: e1351739@u.nus.edu
+    version: v0.1
+  auth:
+    resource:
+      enable: true
+      excludeLoginPaths:
+        - /students/register
+        - /users/detail/{isStaff}
+        - /users/list
+        - GET:/users/{id}
+        - /users/{id}/type
+        - /users/ids
+        - /users/me

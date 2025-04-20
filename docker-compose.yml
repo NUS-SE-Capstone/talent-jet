@@ -1,0 +1,42 @@
+version: "3"
+services:
+  nacos:
+    image: nacos/nacos-server:v1.4.8
+    container_name: nacos
+    platform: linux/amd64
+    environment:
+      - MODE=standalone
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST=host.docker.internal
+      - MYSQL_SERVICE_PORT=3306
+      - MYSQL_SERVICE_DB_NAME=nacos
+      - MYSQL_SERVICE_USER=root
+      - MYSQL_SERVICE_PASSWORD=root
+      - NACOS_AUTH_TOKEN=3117a68c57e4ee749aff9fabab250551da57c7559211ed14127754597fb2b40e
+      - JVM_XMS=256m
+      - JVM_XMX=512m
+    ports:
+      - "8848:8848"
+    volumes:
+      - ./nacos/logs:/home/nacos/logs
+  tj-auth:
+    build:
+      context: tj-auth/tj-auth-service
+      dockerfile: Dockerfile
+    container_name: tj-auth
+    ports:
+      - "8081:8081"
+  tj-gateway:
+    build:
+      context: tj-gateway
+      dockerfile: Dockerfile
+    container_name: tj-gateway
+    ports:
+      - "10010:10010"
+  tj-user:
+    build:
+      context: tj-user
+      dockerfile: Dockerfile
+    container_name: tj-user
+    ports:
+      - "8082:8082"

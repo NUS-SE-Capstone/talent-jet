@@ -1,0 +1,19 @@
+{
+  "groups": [
+    {
+      "name": "tj.auth.gateway",
+      "type": "edu.nus.iss.authsdk.gateway.config.AuthAutoConfiguration",
+      "sourceType": "edu.nus.iss.authsdk.gateway.config.AuthProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "tj.auth.excludePath",
+      "type": "java.util.Set",
+      "description": "不用登录就能访问的路径，ant风格通配符",
+      "sourceType": "edu.nus.iss.authsdk.gateway.config.AuthProperties",
+      "defaultValue": ""
+    }
+  ],
+  "hints": []
+}
