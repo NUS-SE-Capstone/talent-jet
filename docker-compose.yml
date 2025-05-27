@@ -19,6 +19,31 @@ services:
       - "8848:8848"
     volumes:
       - ./nacos/logs:/home/nacos/logs
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    platform: linux/amd64
+    container_name: es
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false   # 可选：关闭安全功能，便于开发
+    volumes:
+      - ./es/data:/usr/share/elasticsearch/data
+      - ./es/es-config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    platform: linux/amd64
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: tjxt
+      RABBITMQ_DEFAULT_PASS: 123456
+      RABBITMQ_DEFAULT_VHOST: /tjxt
+    ports:
+      - "5672:5672"
+      - "15672:15672"
   tj-auth:
     build:
       context: tj-auth/tj-auth-service
@@ -37,6 +62,21 @@ services:
     build:
       context: tj-user
       dockerfile: Dockerfile
+    image: hangtang/tj-user:latest
     container_name: tj-user
     ports:
       - "8082:8082"
+  tj-course:
+    build:
+      context: tj-course
+      dockerfile: Dockerfile
+    container_name: tj-course
+    ports:
+      - "8086:8086"
+  tj-search:
+    build:
+      context: tj-search
+      dockerfile: Dockerfile
+    container_name: tj-search
+    ports:
+      - "8083:8083"
