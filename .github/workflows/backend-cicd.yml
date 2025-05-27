@@ -25,13 +25,8 @@ jobs:
         run:
           mvn clean install
 
-      - name: Build tj-user
-        run: |
-          cd tj-user
-          mvn clean package
-
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2.0.1
         with:
           name: tj-user-jar
           path: tj-user/target/tj-user.jar
