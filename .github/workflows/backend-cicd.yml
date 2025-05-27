@@ -94,3 +94,18 @@ jobs:
         run: |
           docker compose build tj-user
           docker compose push tj-user
+
+  deploy:
+    needs: docker-image-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd /www/dependency/docker
+            docker compose pull tj-user
+            docker compose up -d tj-user
