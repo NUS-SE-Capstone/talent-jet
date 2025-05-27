@@ -21,9 +21,14 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Build tj-user
+      - name: Build talent-jet
         run:
           mvn clean install
+
+      - name: Build tj-user
+        run: |
+          cd tj-user
+          mvn clean package
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v3
