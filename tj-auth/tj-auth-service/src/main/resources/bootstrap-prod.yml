@@ -10,11 +10,13 @@ logging:
     edu.nus.iss: debug
 tj:
   jdbc:
-    host: host.docker.internal
+#    host: host.docker.internal
+    host: 47.236.232.187
     port: 3306
     database: tj_auth
     username: root
     password: root
   redis:
-    host: host.docker.internal
+#    host: host.docker.internal
+    host: 47.236.232.187
     password: 123456
