@@ -25,6 +25,12 @@ jobs:
         run:
           mvn clean install
 
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: tj-user-jar
+          path: tj-user/target/tj-user.jar
+
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -70,6 +76,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: tj-user-jar
+          path: tj-user/target
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
