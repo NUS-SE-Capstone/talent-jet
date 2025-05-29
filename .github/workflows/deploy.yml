@@ -1,33 +1,33 @@
-  --
-  - name: Deploy application using Docker
-    hosts: "{{ target_host }}"  # 动态传递服务器信息
-    become: yes  # 获取 sudo 权限
+---
+- name: Deploy application using Docker
+  hosts: "{{ target_host }}"  # 动态传递服务器信息
+  become: yes  # 获取 sudo 权限
 
-    tasks:
-      - name: Check if Docker is installed
-        command: docker --version
-        register: docker_version
-        ignore_errors: yes  # 忽略错误，以便后续任务可以继续执行
+  tasks:
+    - name: Check if Docker is installed
+      command: docker --version
+      register: docker_version
+      ignore_errors: yes  # 忽略错误，以便后续任务可以继续执行
 
-      - name: Ensure Docker is installed
-        apt:
-          name: docker.io
-          state: present
-        when: docker_version.rc != 0  # 仅当 Docker 未安装时才执行
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+      when: docker_version.rc != 0  # 仅当 Docker 未安装时才执行
 
-      - name: Check if Docker Compose is installed
-        command: docker-compose --version
-        register: compose_version
-        ignore_errors: yes  # 忽略错误，以便后续任务可以继续执行
+    - name: Check if Docker Compose is installed
+      command: docker-compose --version
+      register: compose_version
+      ignore_errors: yes  # 忽略错误，以便后续任务可以继续执行
 
-      - name: Ensure docker-compose is installed
-        apt:
-          name: docker-compose
-          state: present
-        when: compose_version.rc != 0  # 仅当 Docker Compose 未安装时才执行
+    - name: Ensure docker-compose is installed
+      apt:
+        name: docker-compose
+        state: present
+      when: compose_version.rc != 0  # 仅当 Docker Compose 未安装时才执行
 
-      - name: Pull latest Docker images and Restart Services
-        shell:
-          docker compose up -d tj-user
-        args:
-          chdir: /www/docker
+    - name: Pull latest Docker images and Restart Services
+      shell:
+        docker compose up -d tj-user
+      args:
+        chdir: /www/docker
