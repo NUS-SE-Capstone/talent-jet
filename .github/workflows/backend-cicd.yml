@@ -108,4 +108,5 @@ jobs:
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i ${{ secrets.DEPLOY_HOST }}, -u ${{ secrets.DEPLOY_USER }} ./.github/workflows/deploy.yml --extra-vars "docker_username=${{ secrets.DOCKERHUB_USERNAME }} target_host=${{ secrets.DEPLOY_HOST }}"
+          ansible-playbook deploy.yml -i "${{ secrets.DEPLOY_HOST }}," -u "${{ secrets.DEPLOY_USER }}" \
+          --extra-vars "docker_username=${{ secrets.DOCKERHUB_USERNAME }} target_host=${{ secrets.DEPLOY_HOST }}"
