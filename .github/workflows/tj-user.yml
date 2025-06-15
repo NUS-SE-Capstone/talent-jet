@@ -1,5 +1,5 @@
-name: Backend CI
-
+# .github/workflows/tj-user.yml
+name: CI/CD for tj-user
 on:
   push:
     paths:
@@ -108,5 +108,7 @@ jobs:
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook deploy.yml -i "${{ secrets.DEPLOY_HOST }}," -u "${{ secrets.DEPLOY_USER }}" \
-          --extra-vars "docker_username=${{ secrets.DOCKERHUB_USERNAME }} target_host=${{ secrets.DEPLOY_HOST }}"
+          ansible-playbook infra/ansible/deploy.yml \
+          -i "${{ secrets.DEPLOY_HOST }}," \
+          -u "${{ secrets.DEPLOY_USER }}" \
+          --extra-vars "docker_username=${{ secrets.DOCKERHUB_USERNAME }} target_host=${{ secrets.DEPLOY_HOST }} service_name=tj-user"

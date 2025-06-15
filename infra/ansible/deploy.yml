@@ -1,0 +1,37 @@
+---
+- name: Deploy {{ service_name }} using Docker
+  hosts: "{{ target_host }}"
+  become: true
+
+  vars:
+    deploy_path: "/www/docker/{{ service_name }}"
+
+  tasks:
+    - name: Check if Docker is installed
+      command: docker --version
+      register: docker_version
+      ignore_errors: true
+
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+      when: docker_version.rc != 0
+
+    - name: Check if Docker Compose is installed
+      command: docker-compose --version
+      register: compose_version
+      ignore_errors: true
+
+    - name: Ensure docker-compose is installed
+      apt:
+        name: docker-compose
+        state: present
+      when: compose_version.rc != 0
+
+    - name: Pull latest Docker images and restart {{ service_name }}
+      shell: |
+        docker compose pull {{ service_name }}
+        docker compose up -d {{ service_name }}
+      args:
+        chdir: "{{ deploy_path }}"
