@@ -17,6 +17,14 @@
         <module>tj-auth/tj-auth-resource-sdk</module>
         <module>tj-user</module>
         <module>tj-gateway</module>
+        <module>tj-course</module>
+        <module>tj-search</module>
+        <module>tj-media</module>
+        <module>tj-exam</module>
+        <module>tj-learning</module>
+        <module>tj-remark</module>
+        <module>tj-trade</module>
+        <module>tj-pay</module>
     </modules>
 
     <!-- 继承 Spring Boot 父工程 -->
@@ -50,7 +58,7 @@
         <tencent.sdk.cos.version>5.6.89</tencent.sdk.cos.version>
         <tencent.sdk.vod.version>2.1.5</tencent.sdk.vod.version>
         <xxl-job-version>2.3.1</xxl-job-version>
-        <seata-version>1.5.1</seata-version>
+        <seata-version>1.5.2</seata-version>
     </properties>
     <!-- 对依赖包进行管理 -->
     <dependencyManagement>
@@ -115,7 +123,7 @@
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
-                <version>${ali.sdk.oss.version}</version>
+                <version>3.10.2</version>
             </dependency>
             <!--redisson-->
             <dependency>

@@ -7,7 +7,7 @@ services:
     environment:
       - MODE=standalone
       - SPRING_DATASOURCE_PLATFORM=mysql
-      - MYSQL_SERVICE_HOST=host.docker.internal
+      - MYSQL_SERVICE_HOST=47.236.232.187
       - MYSQL_SERVICE_PORT=3306
       - MYSQL_SERVICE_DB_NAME=nacos
       - MYSQL_SERVICE_USER=root
@@ -18,18 +18,48 @@ services:
     ports:
       - "8848:8848"
     volumes:
-      - ./nacos/logs:/home/nacos/logs
+      - ./volumes/nacos/logs:/home/nacos/logs
+  seata-server:
+    image: seataio/seata-server:1.5.2
+    ports:
+      - "7091:7091"
+      - "8091:8091"
+    environment:
+      - STORE_MODE=db
+      # Register the seata server with SEATA_IP as the host
+      - SEATA_IP=47.236.232.187
+      - SEATA_PORT=8091
+    volumes:
+      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
+      - /usr/share/zoneinfo/Asia/Shanghai:/etc/timezone
+      - ./volumes/seata/resources/application.yml:/seata-server/resources/application.yml
+  xxl-job:
+    image: xuxueli/xxl-job-admin:2.3.0
+    platform: linux/amd64
+    container_name: xxl-job
+    ports:
+      - "8880:8080"
+    environment:
+      PARAMS: '
+        --spring.datasource.url=jdbc:mysql://47.236.232.187:3306/xxl-job?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+        --spring.datasource.username=root
+        --spring.datasource.password=root
+        --xxl.job.accessToken=tianji
+        -Xms128m
+        -Xmx384m'
+    volumes:
+      - ./volumes/xxl-job/logs:/data/applogs
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
     platform: linux/amd64
     container_name: es
     environment:
       - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
       - xpack.security.enabled=false   # 可选：关闭安全功能，便于开发
     volumes:
-      - ./es/data:/usr/share/elasticsearch/data
-      - ./es/es-config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./volumes/es/data:/usr/share/elasticsearch/data
+      - ./volumes/es/es-config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -44,13 +74,43 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    volumes:
+      - ./volumes/rabbitmq/data:/var/lib/rabbitmq
+
+  tj-user:
+    build:
+      context: tj-user
+      dockerfile: Dockerfile
+    container_name: tj-user
+    ports:
+      - "8082:8082"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -jar
+      - /app/tj-user.jar
+      - --spring.profiles.active=prod
   tj-auth:
     build:
-      context: tj-auth/tj-auth-service
+      context: tj-auth
       dockerfile: Dockerfile
     container_name: tj-auth
     ports:
       - "8081:8081"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -jar
+      - /app/tj-auth-service.jar
+      - --spring.profiles.active=prod
   tj-gateway:
     build:
       context: tj-gateway
@@ -58,14 +118,16 @@ services:
     container_name: tj-gateway
     ports:
       - "10010:10010"
-  tj-user:
-    build:
-      context: tj-user
-      dockerfile: Dockerfile
-    image: hangtang/tj-user:latest
-    container_name: tj-user
-    ports:
-      - "8082:8082"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -jar
+      - /app/tj-gateway.jar
+      - --spring.profiles.active=prod
   tj-course:
     build:
       context: tj-course
@@ -73,6 +135,16 @@ services:
     container_name: tj-course
     ports:
       - "8086:8086"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -jar
+      - /app/tj-course.jar
+      - --spring.profiles.active=prod
   tj-search:
     build:
       context: tj-search
@@ -80,3 +152,101 @@ services:
     container_name: tj-search
     ports:
       - "8083:8083"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -jar
+      - /app/tj-search.jar
+      - --spring.profiles.active=prod
+  tj-media:
+    build:
+      context: tj-media
+      dockerfile: Dockerfile
+    container_name: tj-media
+    ports:
+      - "8084:8084"
+      - "5005:5005"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005
+      - -jar
+      - /app/tj-media.jar
+      - --spring.profiles.active=prod
+  tj-exam:
+    build:
+      context: tj-exam
+      dockerfile: Dockerfile
+    container_name: tj-exam
+    ports:
+      - "8089:8089"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -jar
+      - /app/tj-exam.jar
+      - --spring.profiles.active=prod
+  tj-learning:
+    build:
+      context: tj-learning
+      dockerfile: Dockerfile
+    container_name: tj-learning
+    ports:
+      - "8090:8090"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -jar
+      - /app/tj-learning.jar
+      - --spring.profiles.active=prod
+  tj-remark:
+    build:
+      context: tj-remark
+      dockerfile: Dockerfile
+    container_name: tj-remark
+    ports:
+      - "8092:8092"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -jar
+      - /app/tj-remark.jar
+      - --spring.profiles.active=prod
+      - --server.port=8092
+  tj-trade:
+    build:
+      context: tj-trade
+      dockerfile: Dockerfile
+    container_name: tj-trade
+    ports:
+      - "8088:8088"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -jar
+      - /app/tj-trade.jar
+      - --spring.profiles.active=prod
