@@ -11,14 +11,14 @@ spring:
 tj:
   jdbc:
 #    host: host.docker.internal
-    host: 47.236.232.187
+    host: 121.199.73.232
     port: 3306
     database: tj_search
     username: root
-    password: root
+    password: root1234
   redis:
 #    host: host.docker.internal
-    host: 47.236.232.187
+    host: 121.199.73.232
     password: 123456
 
 logging:

@@ -11,8 +11,8 @@ logging:
 
 tj:
   jdbc:
-    host: 47.236.232.187
+    host: 121.199.73.232
     port: 3306
     database: tj_user
     username: root
-    password: root
+    password: root1234

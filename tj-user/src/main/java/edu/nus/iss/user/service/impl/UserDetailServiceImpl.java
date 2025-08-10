@@ -1,14 +1,17 @@
 package edu.nus.iss.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import edu.nus.iss.common.enums.UserType;
 import edu.nus.iss.common.utils.StringUtils;
 import edu.nus.iss.user.domain.po.UserDetail;
 import edu.nus.iss.user.domain.query.UserPageQuery;
 import edu.nus.iss.user.mapper.UserDetailMapper;
 import edu.nus.iss.user.service.IUserDetailService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,5 +54,12 @@ public class UserDetailServiceImpl extends ServiceImpl<UserDetailMapper, UserDet
         p = getBaseMapper().queryByPage(p, wrapper);
         // 4.返回
         return p;
+    }
+
+    @XxlJob("resetAllTokens")
+    public void resetAllTokens(){
+        UpdateWrapper<UserDetail> up = new UpdateWrapper<>();
+        up.set("token",5000);
+        update(up);
     }
 }

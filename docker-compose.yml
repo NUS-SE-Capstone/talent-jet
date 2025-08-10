@@ -1,5 +1,32 @@
 version: "3"
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    platform: linux/amd64
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./volumes/mysql/data:/var/lib/mysql
+      - ./volumes/sql:/docker-entrypoint-initdb.d
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --max_connections=500
+      --lower_case_table_names=1
+    restart: always
+  redis:
+    image: redis:6.2
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass 123456
+    volumes:
+      - ./volumes/redis/data:/data
+    restart: always
   nacos:
     image: nacos/nacos-server:v1.4.8
     container_name: nacos
@@ -7,7 +34,7 @@ services:
     environment:
       - MODE=standalone
       - SPRING_DATASOURCE_PLATFORM=mysql
-      - MYSQL_SERVICE_HOST=47.236.232.187
+      - MYSQL_SERVICE_HOST=mysql
       - MYSQL_SERVICE_PORT=3306
       - MYSQL_SERVICE_DB_NAME=nacos
       - MYSQL_SERVICE_USER=root
@@ -20,6 +47,7 @@ services:
     volumes:
       - ./volumes/nacos/logs:/home/nacos/logs
   seata-server:
+    container_name: seata-server
     image: seataio/seata-server:1.5.2
     ports:
       - "7091:7091"
@@ -27,7 +55,7 @@ services:
     environment:
       - STORE_MODE=db
       # Register the seata server with SEATA_IP as the host
-      - SEATA_IP=47.236.232.187
+      - SEATA_IP=host.docker.internal
       - SEATA_PORT=8091
     volumes:
       - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
@@ -41,7 +69,7 @@ services:
       - "8880:8080"
     environment:
       PARAMS: '
-        --spring.datasource.url=jdbc:mysql://47.236.232.187:3306/xxl-job?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+        --spring.datasource.url=jdbc:mysql://mysql:3306/xxl_job?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
         --spring.datasource.username=root
         --spring.datasource.password=root
         --xxl.job.accessToken=tianji
@@ -75,12 +103,13 @@ services:
       - "5672:5672"
       - "15672:15672"
     volumes:
-      - ./volumes/rabbitmq/data:/var/lib/rabbitmq
+      - ./volumes/rabbitmq/data/mnesia:/var/lib/rabbitmq/mnesia
 
   tj-user:
     build:
       context: tj-user
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-user:latest
     container_name: tj-user
     ports:
       - "8082:8082"
@@ -93,11 +122,12 @@ services:
       - -Dfile.encoding=UTF-8
       - -jar
       - /app/tj-user.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
   tj-auth:
     build:
-      context: tj-auth
+      context: tj-auth/tj-auth-service
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-auth:latest
     container_name: tj-auth
     ports:
       - "8081:8081"
@@ -110,11 +140,12 @@ services:
       - -Dfile.encoding=UTF-8
       - -jar
       - /app/tj-auth-service.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
   tj-gateway:
     build:
       context: tj-gateway
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-gateway:latest
     container_name: tj-gateway
     ports:
       - "10010:10010"
@@ -127,11 +158,12 @@ services:
       - -Dfile.encoding=UTF-8
       - -jar
       - /app/tj-gateway.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
   tj-course:
     build:
       context: tj-course
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-course:latest
     container_name: tj-course
     ports:
       - "8086:8086"
@@ -144,11 +176,12 @@ services:
       - -Dfile.encoding=UTF-8
       - -jar
       - /app/tj-course.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
   tj-search:
     build:
       context: tj-search
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-search:latest
     container_name: tj-search
     ports:
       - "8083:8083"
@@ -161,11 +194,12 @@ services:
       - -Dfile.encoding=UTF-8
       - -jar
       - /app/tj-search.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
   tj-media:
     build:
       context: tj-media
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-media:latest
     container_name: tj-media
     ports:
       - "8084:8084"
@@ -180,14 +214,16 @@ services:
       - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005
       - -jar
       - /app/tj-media.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
   tj-exam:
     build:
       context: tj-exam
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-exam:latest
     container_name: tj-exam
     ports:
       - "8089:8089"
+      - "5006:5006"
     entrypoint:
       - java
       - -Xms256m
@@ -195,13 +231,15 @@ services:
       - -XX:+UseG1GC
       - -XX:MaxGCPauseMillis=200
       - -Dfile.encoding=UTF-8
+      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006
       - -jar
       - /app/tj-exam.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
   tj-learning:
     build:
       context: tj-learning
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-learning:latest
     container_name: tj-learning
     ports:
       - "8090:8090"
@@ -214,11 +252,12 @@ services:
       - -Dfile.encoding=UTF-8
       - -jar
       - /app/tj-learning.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
   tj-remark:
     build:
       context: tj-remark
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-remark:latest
     container_name: tj-remark
     ports:
       - "8092:8092"
@@ -231,12 +270,13 @@ services:
       - -Dfile.encoding=UTF-8
       - -jar
       - /app/tj-remark.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
       - --server.port=8092
   tj-trade:
     build:
       context: tj-trade
       dockerfile: Dockerfile
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-trade:latest
     container_name: tj-trade
     ports:
       - "8088:8088"
@@ -249,4 +289,38 @@ services:
       - -Dfile.encoding=UTF-8
       - -jar
       - /app/tj-trade.jar
-      - --spring.profiles.active=prod
+      - --spring.profiles.active=dev
+#  tj-data:
+#    build:
+#      context: tj-data
+#      dockerfile: Dockerfile
+#    image: hangtang/tj-data
+#    container_name: tj-data
+#    ports:
+#      - "8093:8093"
+#    entrypoint:
+#      - java
+#      - -Xms256m
+#      - -Xmx512m
+#      - -XX:+UseG1GC
+#      - -XX:MaxGCPauseMillis=200
+#      - -Dfile.encoding=UTF-8
+#      - -jar
+#      - /app/tj-data.jar
+#      - --spring.profiles.active=dev
+  tj-ai:
+    image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-ai:latest
+    container_name: tj-ai
+    ports:
+      - "6060:6060"
+      - "5008:5008"
+    entrypoint:
+      - java
+      - -Xms256m
+      - -Xmx512m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - -Dfile.encoding=UTF-8
+      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008
+      - -jar
+      - /app/talent-jet-ai.jar

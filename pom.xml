@@ -25,6 +25,7 @@
         <module>tj-remark</module>
         <module>tj-trade</module>
         <module>tj-pay</module>
+        <module>tj-data</module>
     </modules>
 
     <!-- 继承 Spring Boot 父工程 -->

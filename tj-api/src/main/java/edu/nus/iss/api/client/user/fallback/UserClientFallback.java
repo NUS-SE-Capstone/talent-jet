@@ -40,6 +40,11 @@ public class UserClientFallback implements FallbackFactory<UserClient> {
             public UserDTO queryUserById(Long id) {
                 return null;
             }
+
+            @Override
+            public void updateUserById(UserDTO userDTO){
+                return;
+            }
         };
     }
 }

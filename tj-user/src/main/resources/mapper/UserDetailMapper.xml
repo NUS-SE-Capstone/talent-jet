@@ -5,7 +5,7 @@
     <select id="queryById" resultType="edu.nus.iss.user.domain.po.UserDetail">
         SELECT u.cell_phone, u.status, u.create_time, u.update_time, u.creater, u.updater,
                u.id, u.username, ud.type, ud.name, ud.gender, ud.icon, ud.email, ud.qq, ud.birthday,
-               ud.job, ud.province, ud.city, ud.district, ud.intro, ud.photo, ud.role_id
+               ud.job, ud.province, ud.city, ud.district, ud.intro, ud.photo, ud.role_id, ud.token
         FROM `user` u
                  LEFT JOIN user_detail ud ON u.id = ud.id
         WHERE u.id = #{userId}

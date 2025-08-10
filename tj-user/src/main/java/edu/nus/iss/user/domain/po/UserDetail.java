@@ -135,4 +135,8 @@ public class UserDetail implements Serializable {
     private String username;
     @TableField(exist = false)
     private Integer status;
+    /**
+     * 剩余token数量
+     */
+    private Integer token;
 }

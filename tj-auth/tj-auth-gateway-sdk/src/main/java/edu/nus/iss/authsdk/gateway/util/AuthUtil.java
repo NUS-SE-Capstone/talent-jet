@@ -148,7 +148,7 @@ public class AuthUtil {
     }
 
 
-    @Scheduled(fixedDelay = 20000)
+    @Scheduled(initialDelay = 20000, fixedDelay = 20000)
     public void refreshTask(){
         // 1.获取版本号
         int currentVersion = currentVersion();

@@ -37,4 +37,6 @@ public class UserDetailVO {
     private LocalDateTime createTime;
     @ApiModelProperty(value = "角色名称", example = "教师")
     private String roleName;
+    @ApiModelProperty(value = "剩余token数量")
+    private Integer token;
 }

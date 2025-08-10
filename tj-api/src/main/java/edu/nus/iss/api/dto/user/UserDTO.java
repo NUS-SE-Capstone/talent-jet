@@ -50,4 +50,6 @@ public class UserDTO {
     @ApiModelProperty(value = "性别：0-男性，1-女性", example = "0")
     @EnumValid(enumeration = {0, 1}, message = "性别格式不正确")
     private Integer gender;
+    @ApiModelProperty(value = "token数量")
+    private Integer token;
 }

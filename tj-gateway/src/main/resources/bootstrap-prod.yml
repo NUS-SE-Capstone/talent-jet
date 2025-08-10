@@ -8,3 +8,7 @@ spring:
 logging:
   level:
     edu.nus.iss: debug
+tj:
+  redis:
+    host: 121.199.73.232
+    password: 123456

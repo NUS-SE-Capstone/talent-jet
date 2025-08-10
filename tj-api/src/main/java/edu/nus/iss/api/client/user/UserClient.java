@@ -54,4 +54,11 @@ public interface UserClient {
      */
     @GetMapping("/users/{id}")
     UserDTO queryUserById(@PathVariable("id") Long id);
+
+    /**
+     * 根据id更新单个学生信息
+     * @param
+     */
+    @PutMapping("/users/info")
+    void updateUserById(@RequestBody UserDTO userDTO);
 }

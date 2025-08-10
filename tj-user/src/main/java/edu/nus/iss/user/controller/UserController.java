@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @ApiOperation("更新用户信息")
-    @PutMapping("/{id}")
+    @PutMapping("/info")
     public void updateUser(@RequestBody UserDTO userDTO){
         userService.updateUser(userDTO);
     }

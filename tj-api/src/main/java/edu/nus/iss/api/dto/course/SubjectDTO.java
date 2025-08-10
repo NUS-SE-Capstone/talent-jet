@@ -7,7 +7,14 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.List;
 
-
+/**
+ * <p>
+ * 考试记录表
+ * </p>
+ *
+ * @author 虎哥
+ * @since 2022-07-18
+ */
 @Data
 @ApiModel(description = "考试问题详情")
 public class SubjectDTO implements Serializable {
