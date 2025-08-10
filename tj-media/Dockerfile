@@ -10,5 +10,6 @@ ADD target/tj-media.jar /app/tj-media.jar
 # 暴露端口
 EXPOSE 8084
 
+
 # 启动命令，指定 Spring 环境配置为 `prod`
 ENTRYPOINT ["java", "-jar", "/app/tj-media.jar", "--spring.profiles.active=prod"]
