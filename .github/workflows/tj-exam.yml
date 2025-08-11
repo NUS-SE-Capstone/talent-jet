@@ -46,7 +46,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: tj-exam-jar
+          name: tj-exam
           path: tj-exam/target/*.jar
 
 
@@ -87,7 +87,7 @@ jobs:
       - name: Download built jar artifact
         uses: actions/download-artifact@v4
         with:
-          name: tj-exam-jar
+          name: tj-exam
           path: tj-exam/target/
 
       - name: Set up Docker Buildx
@@ -101,6 +101,9 @@ jobs:
           password: ${{ secrets.ALIYUN_PASSWORD }}
 
       - name: Build and push Docker Image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker compose build tj-exam
-          docker compose push tj-exam
+          cd tj-exam
+          docker build -t crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-exam:$IMAGE_TAG .
+          docker push crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-exam:$IMAGE_TAG
