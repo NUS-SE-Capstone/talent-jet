@@ -10,7 +10,6 @@ logging:
     edu.nus.iss: debug
 tj:
   jdbc:
-    #    host: host.docker.internal
     host: 121.199.73.232
     port: 3306
     database: tj_exam
