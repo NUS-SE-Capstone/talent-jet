@@ -125,5 +125,5 @@ jobs:
           git config user.email "github-actions@github.com"
           git add k8s/service/tj-exam.yaml
           git commit -m "Update tj-exam image tag to $IMAGE_TAG"
-          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/NUS-SE-Capstone/talent-jet.git
+          git remote set-url origin https://x-access-token:$PAT_TOKEN@github.com/NUS-SE-Capstone/talent-jet.git
           git push origin HEAD:main
