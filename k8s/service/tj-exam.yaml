@@ -45,6 +45,3 @@ spec:
     - name: http
       port: 8089
       targetPort: 8089
-  template:
-    spec:
-      containers: []
