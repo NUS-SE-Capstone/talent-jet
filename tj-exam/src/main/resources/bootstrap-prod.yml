@@ -8,7 +8,6 @@ spring:
 logging:
   level:
     edu.nus.iss: debug
-
 tj:
   jdbc:
     host: 121.199.73.232
