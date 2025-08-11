@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: rabbitmq
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/rabbitmq:3.12
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: "tjxt"
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "123456"
+            - name: RABBITMQ_DEFAULT_VHOST
+              value: "/tjxt"
+          volumeMounts:
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq
+      volumes:
+        - name: rabbitmq-data
+          persistentVolumeClaim:
+            claimName: rabbitmq-pvc  # 你需要提前创建好这个 PVC
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - protocol: TCP
+      name: rabbitmq-port-5672
+      port: 5672
+      targetPort: 5672
+    - protocol: TCP
+      name: rabbitmq-port-15672
+      port: 15672
+      targetPort: 15672
+  type: LoadBalancer

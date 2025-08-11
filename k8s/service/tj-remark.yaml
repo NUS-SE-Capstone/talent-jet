@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tj-remark
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tj-remark
+  template:
+    metadata:
+      labels:
+        app: tj-remark
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: tj-remark
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-remark:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8092
+          command: ["java"]
+          args:
+            - "-Xms256m"
+            - "-Xmx512m"
+            - "-XX:+UseG1GC"
+            - "-XX:MaxGCPauseMillis=200"
+            - "-Dfile.encoding=UTF-8"
+            - "-jar"
+            - "/app/tj-remark.jar"
+            - "--spring.profiles.active=prod"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tj-remark
+  namespace: default
+spec:
+  selector:
+    app: tj-remark
+  type: ClusterIP   # 如果要公网访问改成 LoadBalancer
+  ports:
+    - name: http
+      port: 8092
+      targetPort: 8092

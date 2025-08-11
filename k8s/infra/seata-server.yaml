@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seata-server
+  labels:
+    app: seata-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seata-server
+  template:
+    metadata:
+      labels:
+        app: seata-server
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: seata-server
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/seata-server:1.5.2
+          ports:
+            - containerPort: 7091
+            - containerPort: 8091
+          env:
+            - name: STORE_MODE
+              value: "db"
+            - name: SEATA_IP
+              value: "121.199.73.232"
+            - name: SEATA_PORT
+              value: "8091"
+            - name: TZ
+              value: "Asia/Shanghai"
+          volumeMounts:
+            - name: seata-config-volume
+              mountPath: /seata-server/resources/application.yml
+              subPath: application.yml
+      volumes:
+        - name: seata-config-volume
+          configMap:
+            name: seata-config
+            items:
+              - key: application.yml
+                path: application.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seata-server
+spec:
+  selector:
+    app: seata-server
+  ports:
+    - name: seata-port-7091
+      protocol: TCP
+      port: 7091
+      targetPort: 7091
+    - name: seata-port-8091
+      protocol: TCP
+      port: 8091
+      targetPort: 8091
+  type: ClusterIP

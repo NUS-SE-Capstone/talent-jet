@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tj-media
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tj-media
+  template:
+    metadata:
+      labels:
+        app: tj-media
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: tj-media
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-media:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+          command: ["java"]
+          args:
+            - "-Xms256m"
+            - "-Xmx512m"
+            - "-XX:+UseG1GC"
+            - "-XX:MaxGCPauseMillis=200"
+            - "-Dfile.encoding=UTF-8"
+            - "-jar"
+            - "/app/tj-media.jar"
+            - "--spring.profiles.active=prod"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tj-media
+  namespace: default
+spec:
+  selector:
+    app: tj-media
+  type: ClusterIP   # 如果要公网访问改成 LoadBalancer
+  ports:
+    - name: http
+      port: 8084
+      targetPort: 8084

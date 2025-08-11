@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tj-user
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tj-user
+  template:
+    metadata:
+      labels:
+        app: tj-user
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: tj-user
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-user:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          command: ["java"]
+          args:
+            - "-Xms256m"
+            - "-Xmx512m"
+            - "-XX:+UseG1GC"
+            - "-XX:MaxGCPauseMillis=200"
+            - "-Dfile.encoding=UTF-8"
+            - "-jar"
+            - "/app/tj-user.jar"
+            - "--spring.profiles.active=prod"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tj-user
+  namespace: default
+spec:
+  selector:
+    app: tj-user
+  type: ClusterIP   # 如果要公网访问改成 LoadBalancer
+  ports:
+    - name: http
+      port: 8082
+      targetPort: 8082

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tj-trade
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tj-trade
+  template:
+    metadata:
+      labels:
+        app: tj-trade
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: tj-trade
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-trade:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8088
+          command: ["java"]
+          args:
+            - "-Xms256m"
+            - "-Xmx512m"
+            - "-XX:+UseG1GC"
+            - "-XX:MaxGCPauseMillis=200"
+            - "-Dfile.encoding=UTF-8"
+            - "-jar"
+            - "/app/tj-trade.jar"
+            - "--spring.profiles.active=prod"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tj-trade
+  namespace: default
+spec:
+  selector:
+    app: tj-trade
+  type: ClusterIP   # 如果要公网访问改成 LoadBalancer
+  ports:
+    - name: http
+      port: 8088
+      targetPort: 8088

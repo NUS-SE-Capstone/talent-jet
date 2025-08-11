@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tj-ai
+  labels:
+    app: tj-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tj-ai
+  template:
+    metadata:
+      labels:
+        app: tj-ai
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: tj-ai
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-ai:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6060
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tj-ai
+  labels:
+    app: tj-ai
+spec:
+  type: ClusterIP   # 如果只在集群内部访问，这里改成 ClusterIP
+  selector:
+    app: tj-ai
+  ports:
+    - port: 6060
+      targetPort: 6060

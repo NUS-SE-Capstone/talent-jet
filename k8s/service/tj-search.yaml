@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tj-search
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tj-search
+  template:
+    metadata:
+      labels:
+        app: tj-search
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: tj-search
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-search:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+          command: ["java"]
+          args:
+            - "-Xms256m"
+            - "-Xmx512m"
+            - "-XX:+UseG1GC"
+            - "-XX:MaxGCPauseMillis=200"
+            - "-Dfile.encoding=UTF-8"
+            - "-jar"
+            - "/app/tj-search.jar"
+            - "--spring.profiles.active=prod"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tj-search
+  namespace: default
+spec:
+  selector:
+    app: tj-search
+  type: ClusterIP   # 如果要公网访问改成 LoadBalancer
+  ports:
+    - name: http
+      port: 8083
+      targetPort: 8083

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xxl-job
+  labels:
+    app: xxl-job
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: xxl-job
+  template:
+    metadata:
+      labels:
+        app: xxl-job
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: xxl-job
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/xxl-job:2.3.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://121.199.73.232:3306/xxl_job?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "root"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "root1234"
+            - name: XXL_JOB_ACCESS_TOKEN
+              value: "tianji"
+            - name: JAVA_OPTS_XMS
+              value: "-Xms128m"
+            - name: JAVA_OPTS_XMX
+              value: "-Xmx384m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xxl-job
+spec:
+  selector:
+    app: xxl-job
+  ports:
+    - protocol: TCP
+      port: 8880
+      targetPort: 8080
+  type: LoadBalancer

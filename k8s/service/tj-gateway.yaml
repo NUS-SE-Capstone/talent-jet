@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tj-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tj-gateway
+  template:
+    metadata:
+      labels:
+        app: tj-gateway
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: tj-gateway
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 10010
+          command: ["java"]
+          args:
+            - "-Xms256m"
+            - "-Xmx512m"
+            - "-XX:+UseG1GC"
+            - "-XX:MaxGCPauseMillis=200"
+            - "-Dfile.encoding=UTF-8"
+            - "-jar"
+            - "/app/tj-gateway.jar"
+            - "--spring.profiles.active=prod"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tj-gateway
+spec:
+  type: LoadBalancer
+  selector:
+    app: tj-gateway
+  ports:
+    - port: 10010
+      targetPort: 10010

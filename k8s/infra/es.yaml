@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: es
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: es
+  template:
+    metadata:
+      labels:
+        app: es
+    spec:
+      securityContext:
+        fsGroup: 1000
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: es
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/es:7.12.1
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          env:
+            - name: discovery.type
+              value: "single-node"
+            - name: ES_JAVA_OPTS
+              value: "-Xms1g -Xmx1g"
+            - name: xpack.security.enabled
+              value: "false"
+          ports:
+            - containerPort: 9200
+            - containerPort: 9300
+          volumeMounts:
+            - name: es-data
+              mountPath: /usr/share/elasticsearch/data
+            - name: es-config
+              mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+              subPath: elasticsearch.yml
+      volumes:
+        - name: es-data
+          persistentVolumeClaim:
+            claimName: es-pvc
+        - name: es-config
+          configMap:
+            name: es-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: es
+spec:
+  selector:
+    app: es
+  ports:
+    - protocol: TCP
+      name: es-port-9200
+      port: 9200
+      targetPort: 9200
+    - protocol: TCP
+      name: es-port-9300
+      port: 9300
+      targetPort: 9300
+  type: LoadBalancer

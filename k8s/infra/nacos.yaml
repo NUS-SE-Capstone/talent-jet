@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nacos
+  namespace: default
+  labels:
+    app: nacos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nacos
+  template:
+    metadata:
+      labels:
+        app: nacos
+    spec:
+      imagePullSecrets:
+        - name: aliyun-registry
+      containers:
+        - name: nacos
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/nacos:v1.4.8
+          ports:
+            - containerPort: 8848
+          env:
+            - name: MODE
+              value: "standalone"
+            - name: SPRING_DATASOURCE_PLATFORM
+              value: "mysql"
+            - name: MYSQL_SERVICE_HOST
+              value: "121.199.73.232"
+            - name: MYSQL_SERVICE_PORT
+              value: "3306"
+            - name: MYSQL_SERVICE_DB_NAME
+              value: "nacos"
+            - name: MYSQL_SERVICE_USER
+              value: "root"
+            - name: MYSQL_SERVICE_PASSWORD
+              value: "root1234"
+            - name: NACOS_AUTH_TOKEN
+              value: "3117a68c57e4ee749aff9fabab250551da57c7559211ed14127754597fb2b40e"
+            - name: JVM_XMS
+              value: "256m"
+            - name: JVM_XMX
+              value: "512m"
+          volumeMounts:
+            - name: nacos-logs
+              mountPath: /home/nacos/logs
+      volumes:
+        - name: nacos-logs
+          persistentVolumeClaim:
+            claimName: nacos-pvc  # 你的PVC名称
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nacos
+  namespace: default
+spec:
+  selector:
+    app: nacos
+  ports:
+    - protocol: TCP
+      port: 8848
+      targetPort: 8848
+  type: LoadBalancer
