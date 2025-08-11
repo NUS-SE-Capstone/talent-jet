@@ -116,13 +116,14 @@ jobs:
           sudo chmod +x /usr/bin/yq
           yq e -i '.spec.template.spec.containers[] |= (select(.name == "tj-exam").image = "crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-exam:" + env(IMAGE_TAG))' k8s/service/tj-exam.yaml
 
-      - name: Commit and push updated k8s manifest to trigger ArgoCD
+      - name: Commit and push updated k8s manifest
         env:
           IMAGE_TAG: ${{ github.sha }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add k8s/service/tj-exam.yaml
           git commit -m "Update tj-exam image tag to $IMAGE_TAG"
+          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/NUS-SE-Capstone/talent-jet.git
           git push origin HEAD:main
