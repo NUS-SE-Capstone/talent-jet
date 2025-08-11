@@ -17,7 +17,7 @@ spec:
         - name: aliyun-registry
       containers:
         - name: tj-exam
-          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-exam:4754e6cce27ce43dba7eab5c1632944ccd58ee8f
+          image: crpi-gbndif6v1gbpzzke.cn-hangzhou.personal.cr.aliyuncs.com/talent-jet/tj-exam:935833b222470fd06456113bf71806cc89afe0a4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8089
@@ -45,3 +45,6 @@ spec:
     - name: http
       port: 8089
       targetPort: 8089
+  template:
+    spec:
+      containers: []
